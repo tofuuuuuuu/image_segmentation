@@ -32,6 +32,7 @@ for i in range (n):
 edge_nodes.sort()
 l = len(edge_nodes)
 edge_nodes = edge_nodes[max(0, l-2000) : l] #take brightest 2000
+# TODO: nearest neighbours for faster MST
 print(len(edge_nodes))
 
 t = mst.DSU(n * m)
@@ -50,6 +51,7 @@ for p1 in edge_nodes :
         t.addEdge(mst.Edge(c1, c2, dst))
 
 print("done1")
+# TODO: hair removal
 my_mst = t.kruskal()
 print("done2")
 

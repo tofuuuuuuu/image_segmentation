@@ -38,3 +38,4 @@ class DSU:
         for e in self.edges:
             if self.merge(e.a, e.b) :
                self.mst.append(e)
+        return self.mst 

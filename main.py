@@ -1,7 +1,11 @@
+import math
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import mst 
+
+def coord_to_int(i, j, n, m):
+    return i * m + j
 
 inp = cv2.imread("input.jpeg")
 inp = cv2.cvtColor(inp, cv2.COLOR_BGR2RGB)
@@ -14,6 +18,31 @@ grad = np.sqrt(grad_x**2, grad_y**2)
 grad_norm = (255 * grad / grad.max())
 
 n, m = grad_norm.shape
+edge_nodes = []
+for i in range (n):
+    for j in range(m):
+        if grad_norm[i, j] != 0 :
+            edge_nodes.append((grad_norm[i, j], i, j))
+
+edge_nodes.sort()
+l = len(edge_nodes)
+edge_nodes = edge_nodes[math.floor(0.7 * l) : l-1] #drop 70% lowest brightness
+
+t = mst.DSU(n * m)
+for p1 in edge_nodes :
+    for p2 in edge_nodes:
+        if p1 >= p2 :
+            continue
+        i1 = p1[1]
+        j1 = p1[2]
+        i2 = p2[1]
+        j2 = p2[2]
+        c1 = coord_to_int(i1, j1, n, m)
+        c2 = coord_to_int(i2, j2, n, m)
+        dst = (i1 - i2)**2 + (j1 - j2)**2
+        t.addEdge(mst.Edge(c1, c2, dst))
+my_mst = t.kruskal()
+
 
 
 

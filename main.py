@@ -12,6 +12,7 @@ def int_to_coord(a, n, m) :
 
 inp = cv2.imread("input.jpeg")
 inp = cv2.cvtColor(inp, cv2.COLOR_BGR2RGB)
+# TODO: scale input down
 gray = cv2.cvtColor(inp, cv2.COLOR_BGR2GRAY)
 blur = cv2.GaussianBlur(gray, (5, 5), 0)
 

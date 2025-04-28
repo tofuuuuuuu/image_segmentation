@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import mst 
 
 inp = cv2.imread("input.jpeg")
 inp = cv2.cvtColor(inp, cv2.COLOR_BGR2RGB)
@@ -12,6 +13,7 @@ grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1)
 grad = np.sqrt(grad_x**2, grad_y**2)
 grad_norm = (255 * grad / grad.max())
 
+n, m = grad_norm.shape
 
 
 

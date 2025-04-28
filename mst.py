@@ -4,6 +4,9 @@ class Edge:
         self.b = b
         self.w = weight
 
+    def __lt__(self, other):
+        return self.w < other.w
+
 class DSU:
     def __init__(self, n):
         self.n = n
@@ -35,7 +38,11 @@ class DSU:
         
     def kruskal(self):
         self.edges.sort()
+        cnt = 0
         for e in self.edges:
+            if cnt == self.n-1 :
+                break
             if self.merge(e.a, e.b) :
                self.mst.append(e)
+               cnt += 1
         return self.mst 

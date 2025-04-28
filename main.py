@@ -4,8 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mst 
 
-def coord_to_int(i, j, n, m):
+def coord_to_int(i, j, n, m) :
     return i * m + j
+
+def int_to_coord(a, n, m) :
+    return (a // m, a % m)
 
 inp = cv2.imread("input.jpeg")
 inp = cv2.cvtColor(inp, cv2.COLOR_BGR2RGB)
@@ -14,7 +17,7 @@ blur = cv2.GaussianBlur(gray, (5, 5), 0)
 
 grad_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0)
 grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1)
-grad = np.sqrt(grad_x**2, grad_y**2)
+grad = np.sqrt(grad_x**2 + grad_y**2)
 grad_norm = (255 * grad / grad.max())
 
 n, m = grad_norm.shape
@@ -26,25 +29,29 @@ for i in range (n):
 
 edge_nodes.sort()
 l = len(edge_nodes)
-edge_nodes = edge_nodes[math.floor(0.7 * l) : l-1] #drop 70% lowest brightness
+edge_nodes = edge_nodes[math.floor(0.7 * l):] #drop 70% lowest brightness
+print(len(edge_nodes))
 
-t = mst.DSU(n * m)
-for p1 in edge_nodes :
-    for p2 in edge_nodes:
-        if p1 >= p2 :
-            continue
-        i1 = p1[1]
-        j1 = p1[2]
-        i2 = p2[1]
-        j2 = p2[2]
-        c1 = coord_to_int(i1, j1, n, m)
-        c2 = coord_to_int(i2, j2, n, m)
-        dst = (i1 - i2)**2 + (j1 - j2)**2
-        t.addEdge(mst.Edge(c1, c2, dst))
-my_mst = t.kruskal()
+# t = mst.DSU(n * m)
+# for p1 in edge_nodes :
+#     for p2 in edge_nodes :
+#         if p1 >= p2 :
+#             continue
+#         i1 = p1[1]
+#         j1 = p1[2]
+#         i2 = p2[1]
+#         j2 = p2[2]
+#         c1 = coord_to_int(i1, j1, n, m)
+#         c2 = coord_to_int(i2, j2, n, m)
+#         dst = (i1 - i2)**2 + (j1 - j2)**2
+#         t.addEdge(mst.Edge(c1, c2, dst))
+# my_mst = t.kruskal()
 
-
-
+# lines = []
+# for e in my_mst :
+#     c1 = int_to_coord(e.a, n, m)
+#     c2 = int_to_coord(e.b, n, m)
+#     lines.append((c1, c2))
 
 plt.subplot(2, 3, 1)
 plt.imshow(inp)
@@ -65,5 +72,13 @@ plt.subplot(2, 3, 4)
 plt.imshow(grad_norm, cmap = 'gray')
 plt.axis('off')
 plt.title('Edges')
+
+# plt.subplot(2, 3, 5)
+# for l in lines:
+#     x = [l[0][0], l[1][0]]
+#     y = [l[0][1], l[1][1]]
+#     plt.plot(x, y, color = 'red', linewidth = 1)
+# plt.axis('off')
+# plt.title('MST')
 
 plt.show()

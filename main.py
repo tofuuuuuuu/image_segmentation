@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mst 
 from sklearn.neighbors import NearestNeighbors
+import random
 
 def coord_to_int(i, j, n, m) :
     return i * m + j
@@ -12,8 +13,14 @@ def int_to_coord(a, n, m) :
     return (a // m, a % m)
 
 inp = cv2.imread("input.jpeg")
+
+#scale down to around 50000 pixels
+n, m = inp.shape[:2]
+scaling_factor = (50000 / (n * m)) **0.5
+inp = cv2.resize(inp, (int(m * scaling_factor), int(n * scaling_factor)))
+
+# gray scale + blur
 inp = cv2.cvtColor(inp, cv2.COLOR_BGR2RGB)
-# TODO: scale input down
 gray = cv2.cvtColor(inp, cv2.COLOR_BGR2GRAY)
 blur = cv2.GaussianBlur(gray, (5, 5), 0)
 
@@ -31,14 +38,16 @@ for i in range (n):
 
 edge_nodes.sort()
 l = len(edge_nodes)
-edge_nodes = edge_nodes[max(0, l-2000) : l] #take brightest 2000
+edge_nodes = edge_nodes[math.floor(0.8 * l) : l] # take brightest 30%
+sample = random.sample(edge_nodes, k=min(2000, len(edge_nodes))) # sample 1000
+
 # TODO: nearest neighbours for faster MST
-print(len(edge_nodes))
+
 
 t = mst.DSU(n * m)
 
-for p1 in edge_nodes :
-    for p2 in edge_nodes :
+for p1 in sample :
+    for p2 in sample :
         if p1 >= p2 :
             continue
         i1 = p1[1]

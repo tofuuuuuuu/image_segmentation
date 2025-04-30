@@ -30,39 +30,47 @@ grad = np.sqrt(grad_x**2 + grad_y**2)
 grad_norm = (255 * grad / grad.max())
 
 n, m = grad_norm.shape
+lowerbound = np.percentile(grad_norm, 80) 
 edge_nodes = []
-for i in range (n):
-    for j in range(m):
-        if grad_norm[i, j] != 0 :
-            edge_nodes.append((grad_norm[i, j], i, j))
 
-edge_nodes.sort()
-l = len(edge_nodes)
-edge_nodes = edge_nodes[math.floor(0.8 * l) : l] # take brightest 30%
-sample = random.sample(edge_nodes, k=min(2000, len(edge_nodes))) # sample 1000
+# take the higher 20% brightness
+for i in range(n) :
+    for j in range(m) :
+        if lowerbound <= grad_norm[i, j] :
+            edge_nodes.append([i, j])
 
-# TODO: nearest neighbours for faster MST
-
+points = np.array(edge_nodes)
+sample_idx = np.random.choice(len(points), size=min(len(points), 100000), replace=False) # sample 10^5 points
+sample = points[sample_idx]
+k = 10
+knn = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(sample)
 
 t = mst.DSU(n * m)
 
-for p1 in sample :
-    for p2 in sample :
-        if p1 >= p2 :
-            continue
-        i1 = p1[1]
-        j1 = p1[2]
-        i2 = p2[1]
-        j2 = p2[2]
-        c1 = coord_to_int(i1, j1, n, m)
-        c2 = coord_to_int(i2, j2, n, m)
-        dst = (i1 - i2)**2 + (j1 - j2)**2
-        t.addEdge(mst.Edge(c1, c2, dst))
+print("adding edges")
 
-print("done1")
-# TODO: hair removal
+for p1 in sample :
+    distance, idx = knn.kneighbors([p1])
+    for j in range(k):
+        p2 = sample[idx[0][j]]
+        c1 = coord_to_int(p1[0], p1[1], n, m)
+        c2 = coord_to_int(p2[0], p2[1], n, m)
+        if c1 < c2 : 
+            t.addEdge(mst.Edge(c1, c2, distance[0][j]))
+
+print("done adding edges")
+
+print("finding mst")
+
 my_mst = t.kruskal()
-print("done2")
+
+print("done mst")
+
+# TODO: hair removal
+
+
+
+# TODO: path compression 
 
 lines = []
 for e in my_mst :
@@ -86,7 +94,7 @@ plt.axis('off')
 plt.title('Gaussian Blur')
 
 plt.subplot(2, 3, 4)
-plt.imshow(grad_norm, cmap = 'gray')
+plt.imshow(grad_norm)
 plt.axis('off')
 plt.title('Edges')
 

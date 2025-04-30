@@ -1,10 +1,8 @@
-import math
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import mst 
+import graph 
 from sklearn.neighbors import NearestNeighbors
-import random
 
 def coord_to_int(i, j, n, m) :
     return i * m + j
@@ -22,7 +20,7 @@ inp = cv2.resize(inp, (int(m * scaling_factor), int(n * scaling_factor)))
 # gray scale + blur
 inp = cv2.cvtColor(inp, cv2.COLOR_BGR2RGB)
 gray = cv2.cvtColor(inp, cv2.COLOR_BGR2GRAY)
-blur = cv2.GaussianBlur(gray, (5, 5), 0)
+blur = cv2.GaussianBlur(gray, (3, 3), 0)
 
 grad_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0)
 grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1)
@@ -45,7 +43,7 @@ sample = points[sample_idx]
 k = 10
 knn = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(sample)
 
-t = mst.DSU(n * m)
+t = graph.DSU(n * m)
 
 print("adding edges")
 
@@ -56,52 +54,62 @@ for p1 in sample :
         c1 = coord_to_int(p1[0], p1[1], n, m)
         c2 = coord_to_int(p2[0], p2[1], n, m)
         if c1 < c2 : 
-            t.addEdge(mst.Edge(c1, c2, distance[0][j]))
+            t.addEdge(graph.Edge(c1, c2, distance[0][j]))
 
 print("done adding edges")
 
 print("finding mst")
 
-my_mst = t.kruskal()
+mst = t.kruskal()
 
 print("done mst")
 
 # TODO: hair removal
 
-
+clean_mst = graph.Hair_Remover(n * m, mst)
+clean_edgeset = clean_mst.remove_hairs(4) # remove hairs of order 4 (arbitrary value)
 
 # TODO: path compression 
 
-lines = []
-for e in my_mst :
+lines_mst = []
+for e in mst :
     c1 = int_to_coord(e.a, n, m)
     c2 = int_to_coord(e.b, n, m)
-    lines.append((c1, c2))
+    lines_mst.append((c1, c2))
+
+
+lines_clean = []
+for e in clean_edgeset :
+    c1 = int_to_coord(e[0], n, m)
+    c2 = int_to_coord(e[1], n, m)
+    lines_clean.append((c1, c2))
+
+
 
 print("graphing")
 
-plt.subplot(2, 3, 1)
+plt.subplot(3, 3, 1)
 plt.imshow(inp)
 plt.axis('off')
 plt.title('Input')
 
-plt.subplot(2, 3, 2)
+plt.subplot(3, 3, 2)
 plt.imshow(gray, cmap = 'gray')
 plt.axis('off')
 plt.title('Gray Scale')
 
-plt.subplot(2, 3, 3)
+plt.subplot(3, 3, 3)
 plt.imshow(blur, cmap = 'gray')
 plt.axis('off')
 plt.title('Gaussian Blur')
 
-plt.subplot(2, 3, 4)
+plt.subplot(3, 3, 4)
 plt.imshow(grad_norm)
 plt.axis('off')
 plt.title('Edges')
 
-plt.subplot(2, 3, 5)
-for l in lines:
+plt.subplot(3, 3, 5)
+for l in lines_mst:
     x = [l[0][0], l[1][0]]
     y = [l[0][1], l[1][1]]
     plt.plot(y, x, color = 'red', linewidth = 1)
@@ -110,8 +118,18 @@ plt.ylim(n, 0)
 plt.axis('off')
 plt.title('MST')
 
-plt.subplot(2, 3, 6)
-for l in lines:
+plt.subplot(3, 3, 6)
+for l in lines_clean:
+    x = [l[0][0], l[1][0]]
+    y = [l[0][1], l[1][1]]
+    plt.plot(y, x, color = 'red', linewidth = 1)
+plt.xlim(0, m)  
+plt.ylim(n, 0) 
+plt.axis('off')
+plt.title('Hair removal')
+
+plt.subplot(3, 3, 7)
+for l in lines_clean:
     x = [l[0][0], l[1][0]]
     y = [l[0][1], l[1][1]]
     plt.plot(y, x, color = 'red', linewidth = 1)
@@ -121,6 +139,6 @@ plt.ylim(n, 0)
 plt.axis('off')
 plt.title('Overlay')
 
-plt.show()
-
 print("done graphing")
+
+plt.show()

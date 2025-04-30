@@ -78,6 +78,8 @@ for e in my_mst :
     c2 = int_to_coord(e.b, n, m)
     lines.append((c1, c2))
 
+print("graphing")
+
 plt.subplot(2, 3, 1)
 plt.imshow(inp)
 plt.axis('off')
@@ -120,3 +122,5 @@ plt.axis('off')
 plt.title('Overlay')
 
 plt.show()
+
+print("done graphing")

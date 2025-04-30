@@ -71,7 +71,7 @@ class Hair_Remover :
     
     def __dfs_mark_remove(self, v, prev, h) :
         self.vis[v] = True
-        
+
         if self.posterity_rank[v] <= h :
             if self.posterity_rank[prev] > h + 1 :
                 self.remove[v] = True
@@ -79,7 +79,7 @@ class Hair_Remover :
                     if i == prev : 
                         continue
                     self.remove[i] = True
-            elif len(self.adj[v]) > 2 :
+            elif not self.remove[v] and len(self.adj[v]) > 2 :
                 for i in self.adj[v] : 
                     if i == prev :
                         continue

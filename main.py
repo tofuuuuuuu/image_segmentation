@@ -84,7 +84,8 @@ for e in clean_edgeset :
     c2 = int_to_coord(e[1], n, m)
     lines_clean.append((c1, c2))
 
-
+print("image dimensions:", n, "x", m)
+print("final edge count :", len(lines_clean))
 
 print("graphing")
 

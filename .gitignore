@@ -1,2 +1,29 @@
+# Compiled 
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.out
+*.pyc
+*.pyo
+*.pyd
+
+# Environment
+.env
+.venv/
+node_modules/
+__pycache__/
+dist/
+build/
+target/
+
+# Vscode
+.vscode/
+
+# local
 *.jpeg
 test.py
+*.pyc
+*.exe

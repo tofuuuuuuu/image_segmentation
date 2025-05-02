@@ -73,7 +73,6 @@ class Hair_Remover :
             if self.vis[i] :
                 continue
             self.__dfs_posterity(i, i, h)
-            test_components += 1
 
         edges = []
         for i in range(self.n) : 

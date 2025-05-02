@@ -33,7 +33,7 @@ for i in range(n) :
             edge_nodes.append([i, j])
 
 points = np.array(edge_nodes)
-sample_idx = np.random.choice(len(points), size=min(len(points), 300000), replace=False) # sample 10^5 points
+sample_idx = np.random.choice(len(points), size=min(len(points), 3000000), replace=False) # sample 3*10^6 points
 sample = points[sample_idx]
 k = 10
 knn = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(sample)
@@ -64,7 +64,7 @@ print("done mst")
 print ("removing hair")
 
 clean_mst = graph.Hair_Remover(n * m, mst)
-clean_edgeset = clean_mst.remove_hairs(5) # remove hairs of order 5 (arbitrary value)
+clean_edgeset = clean_mst.remove_hairs(3) # remove hairs of order 5 (arbitrary value)
 
 print("done removing hair")
 

@@ -43,37 +43,65 @@ class DSU:
             if self.merge(e.a, e.b) :
                self.mst.append(e)
                components += 1
+        print("# components (dsu):", components)
         return self.mst 
     
 class Hair_Remover :
     def __init__(self, n, edges) :
         self.n = n
         self.adj = [[] for _ in range(n)]
+        self.posterity_rank = [0] * n
         self.vis = [False] * n
         self.remove = [False] * n
         for e in edges :
             self.adj[e.a].append(e.b)
             self.adj[e.b].append(e.a)
 
-    def __dfs_posterity(self, v, prev, h):
+    def __dfs_posterity(self, v, prev):
         self.vis[v] = True
         mx = 0
         for i in self.adj[v] :
             if i == prev : 
                 continue
-            res = self.__dfs_posterity(i, v, h)
-            mx = max(mx, res)
-        posterity_rank = mx + 1
-        if posterity_rank <= h :
-            self.remove[v] = True
-        return posterity_rank
+            self.__dfs_posterity(i, v)
+            mx = max(mx, self.posterity_rank[i])
+        self.posterity_rank[v] = mx + 1
+    
+    def __dfs_mark_remove(self, v, prev, h) :
+        if self.posterity_rank[v] <= h :
+            if self.posterity_rank[prev] > h + 1 :
+                self.remove[v] = True
+                for i in self.adj[v] :
+                    if i == prev : 
+                        continue
+                    self.remove[i] = True
+            elif not self.remove[v] and len(self.adj[v]) > 2 :
+                for i in self.adj[v] : 
+                    if i == prev :
+                        continue
+                    self.remove[i] = True
+                first = self.adj[v][0]
+                second = self.adj[v][1]
+                if first == prev :
+                    self.remove[second] = False
+                else :
+                    self.remove[first] = False
+
+        for i in self.adj[v] :
+            if i == prev :
+                continue
+            self.__dfs_mark_remove(i, v, h)
 
     def remove_hairs(self, h) :
+        test_components = 0
         for i in range(self.n) :
             if self.vis[i] :
                 continue
-            self.__dfs_posterity(i, i, h)
+            self.__dfs_posterity(i, i)
+            self.__dfs_mark_remove(i, i, h)
             test_components += 1
+
+        print("# components (hair remover):", test_components)
 
         edges = []
         for i in range(self.n) : 
@@ -83,4 +111,17 @@ class Hair_Remover :
                 edges.append([i, j])
         return edges
 
-        
+n, m = map(int, input().split())
+
+ds = DSU(n+1)
+
+cnt = 1
+for i in range(m) :
+    a, b = map(int, input().split())
+    ds.addEdge(Edge(a, b, cnt))
+    cnt += 1
+ans = ds.kruskal()
+
+clean_mst = Hair_Remover(n, ans)
+clean_edgeset = clean_mst.remove_hairs(2) 
+print(clean_edgeset)

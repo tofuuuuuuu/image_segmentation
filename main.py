@@ -67,7 +67,7 @@ print("done mst")
 # TODO: hair removal
 
 clean_mst = graph.Hair_Remover(n * m, mst)
-clean_edgeset = clean_mst.remove_hairs(4) # remove hairs of order 4 (arbitrary value)
+clean_edgeset = clean_mst.remove_hairs(5) # remove hairs of order 5 (arbitrary value)
 
 # TODO: path compression 
 

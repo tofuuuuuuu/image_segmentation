@@ -54,8 +54,8 @@ class Hair_Remover :
         self.vis = [False] * n
         self.remove = [False] * n
         for e in edges :
-            self.adj[e.a].append(e.b)
-            self.adj[e.b].append(e.a)
+            self.adj[e[0]].append(e[1])
+            self.adj[e[1]].append(e[0])
 
     def __dfs_posterity(self, v, prev, h):
         self.vis[v] = True

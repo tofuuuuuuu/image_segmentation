@@ -33,7 +33,7 @@ for i in range(n) :
             edge_nodes.append([i, j])
 
 points = np.array(edge_nodes)
-sample_idx = np.random.choice(len(points), size=min(len(points), 100000), replace=False) # sample 10^5 points
+sample_idx = np.random.choice(len(points), size=min(len(points), 300000), replace=False) # sample 10^5 points
 sample = points[sample_idx]
 k = 10
 knn = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(sample)
@@ -56,22 +56,38 @@ print("done adding edges")
 print("finding mst")
 
 mst = t.kruskal()
+for i in range(len(mst)) :
+    mst[i] = [mst[i].a, mst[i].b]
 
 print("done mst")
+
+print ("removing hair")
 
 clean_mst = graph.Hair_Remover(n * m, mst)
 clean_edgeset = clean_mst.remove_hairs(5) # remove hairs of order 5 (arbitrary value)
 
+print("done removing hair")
+
+print("compressing")
+
 compress_mst = graph.Compressor(n * m, clean_edgeset, n, m)
-compress_edgeset = compress_mst.compress(0.0001) # merge edges with cos diff by 0.1 (arbitrary value)
+compress_edgeset = compress_mst.compress(0.0001) # merge edges with cos diff by 0.0001 (arbitrary value)
 # note: for larger images, choose smaller d value 
+
+print("done compressing")
+
+print("hair removal 2")
+
+clean_mst_2 = graph.Hair_Remover(n *m, compress_edgeset)
+final = clean_mst_2.remove_hairs(3)
+
+print("done hair removal 2")
 
 lines_mst = []
 for e in mst :
-    c1 = coord.int_to_coord(e.a, n, m)
-    c2 = coord.int_to_coord(e.b, n, m)
+    c1 = coord.int_to_coord(e[0], n, m)
+    c2 = coord.int_to_coord(e[1], n, m)
     lines_mst.append((c1, c2))
-
 
 lines_clean = []
 for e in clean_edgeset :
@@ -80,14 +96,14 @@ for e in clean_edgeset :
     lines_clean.append((c1, c2))
 
 lines_compress = []
-for e in compress_edgeset :
+for e in final :
     c1 = coord.int_to_coord(e[0], n, m)
     c2 = coord.int_to_coord(e[1], n, m)
     lines_compress.append((c1, c2))
 
 print("image dimensions:", n, "x", m)
 print("hair-removed edge count :", len(lines_clean))
-print("compressed edge count :", len(lines_compress))
+print("final edge count :", len(lines_compress))
 
 print("graphing")
 

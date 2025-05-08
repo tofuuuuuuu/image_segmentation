@@ -71,17 +71,10 @@ print("done removing hair")
 print("compressing")
 
 compress_mst = graph.Compressor(n * m, clean_edgeset, n, m)
-compress_edgeset = compress_mst.compress(0.0001) # merge edges with cos diff by 0.0001 (arbitrary value)
+compress_edgeset = compress_mst.compress(0.0005) # merge edges with cos diff by 0.0005 (arbitrary value)
 # note: for larger images, choose smaller d value 
 
 print("done compressing")
-
-print("hair removal 2")
-
-clean_mst_2 = graph.Hair_Remover(n *m, compress_edgeset)
-final = clean_mst_2.remove_hairs(3)
-
-print("done hair removal 2")
 
 lines_mst = []
 for e in mst :
@@ -96,7 +89,7 @@ for e in clean_edgeset :
     lines_clean.append((c1, c2))
 
 lines_compress = []
-for e in final :
+for e in compress_edgeset :
     c1 = coord.int_to_coord(e[0], n, m)
     c2 = coord.int_to_coord(e[1], n, m)
     lines_compress.append((c1, c2))

@@ -101,12 +101,12 @@ class Compressor :
         c1 = coord.int_to_coord(head, self.N, self.M)
         c2 = coord.int_to_coord(nxt, self.N, self.M)
         c3 = coord.int_to_coord(v, self.N, self.M)
-        cos1 = coord.dot(c1, c2) / (coord.abs(c1) * coord.abs(c2))
-        cos2 = coord.dot(c1, c3) / (coord.abs(c1) * coord.abs(c3))
+        angle1 = coord.angle(c1, c2)
+        angle2 = coord.angle(c1, c3)
 
         newHead = head
         newNxt = nxt
-        if abs(cos1 - cos2) > d :
+        if abs(angle1 - angle2) > d :
             self.compr.append([head, prev])
             newHead = prev
             newNxt = v
